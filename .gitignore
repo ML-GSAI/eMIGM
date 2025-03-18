@@ -1,0 +1,6 @@
+*.pyc
+#bash/
+run_*.py
+log/
+others/
+fid-stats/
