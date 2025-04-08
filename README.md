@@ -64,9 +64,9 @@ These scripts will pre-process the dataset into compressed latent representation
 ## Usage
 **Supported Model Sizes**:
 - **256×256 Resolution**: Five model variants available  
-  `eMIGM-MS`, `eMIGM-S`, `eMIGM-B`, `eMIGM-L`, `eMIGM-H`
+  `eMIGM-XS`, `eMIGM-S`, `eMIGM-B`, `eMIGM-L`, `eMIGM-H`
 - **512×512 Resolution**: Four model variants available  
-  `eMIGM-MS`, `eMIGM-S`, `eMIGM-B`, `eMIGM-L`
+  `eMIGM-XS`, `eMIGM-S`, `eMIGM-B`, `eMIGM-L`
 
 ### Training Instructions
 
