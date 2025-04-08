@@ -286,33 +286,45 @@ def main(args):
 
     # resume training
     if args.resume:
-        # Determine the checkpoint path based on resume_epoch
-        checkpoint_path = os.path.join(
-            args.resume,
-            "checkpoint-last.pth" if args.resume_epoch is None else f"checkpoint-epoch_{args.resume_epoch}.pth"
-        )
+        # Determine the checkpoint path based on resume_epoch or direct .pth file
+        if args.resume.endswith('.pth'):
+            checkpoint_path = args.resume
+        else:
+            checkpoint_path = os.path.join(
+                args.resume,
+                "checkpoint-last.pth" if args.resume_epoch is None else f"checkpoint-epoch_{args.resume_epoch}.pth"
+            )
 
         # Check if the checkpoint file exists
         if os.path.exists(checkpoint_path):
             # Load the checkpoint
             checkpoint = torch.load(checkpoint_path, map_location='cpu')
-            model_without_ddp.load_state_dict(checkpoint['model'])
-            print(f"Resume checkpoint from {checkpoint_path}")
+            
+            # Check if 'model' exists in checkpoint
+            if 'model' in checkpoint:
+                model_without_ddp.load_state_dict(checkpoint['model'])
+                print(f"Resume checkpoint from {checkpoint_path}")
 
-            # Load EMA parameters if available
-            if 'model_ema' in checkpoint:
-                ema_state_dict = checkpoint['model_ema']
-                ema_params = [ema_state_dict[name].cuda() for name, _ in model_without_ddp.named_parameters()]
-            else:
+                # Load EMA parameters if available
+                if 'model_ema' in checkpoint:
+                    ema_state_dict = checkpoint['model_ema']
+                    ema_params = [ema_state_dict[name].cuda() for name, _ in model_without_ddp.named_parameters()]
+                else:
+                    ema_params = copy.deepcopy(list(model_without_ddp.parameters()))
+
+                # Load optimizer, epoch, and scaler if available
+                if 'optimizer' in checkpoint and 'epoch' in checkpoint:
+                    optimizer.load_state_dict(checkpoint['optimizer'])
+                    args.start_epoch = checkpoint['epoch'] + 1
+                    if 'scaler' in checkpoint:
+                        loss_scaler.load_state_dict(checkpoint['scaler'])
+                    print("Resumed optimizer, epoch, and scaler.")
+            
+            # If 'model' doesn't exist but 'model_ema' does
+            elif 'model_ema' in checkpoint:
+                model_without_ddp.load_state_dict(checkpoint['model_ema'])
+                print(f"Resume checkpoint from {checkpoint_path} using model_ema")
                 ema_params = copy.deepcopy(list(model_without_ddp.parameters()))
-
-            # Load optimizer, epoch, and scaler if available
-            if 'optimizer' in checkpoint and 'epoch' in checkpoint:
-                optimizer.load_state_dict(checkpoint['optimizer'])
-                args.start_epoch = checkpoint['epoch'] + 1
-                if 'scaler' in checkpoint:
-                    loss_scaler.load_state_dict(checkpoint['scaler'])
-                print("Resumed optimizer, epoch, and scaler.")
 
             # Free up memory
             del checkpoint

@@ -62,16 +62,15 @@ bash bash/extract/extract_imagenet_512.sh
 These scripts will pre-process the dataset into compressed latent representations that can be loaded efficiently during model training. We strongly recommend running this caching process before initiating the main training procedure. In our standard workflow, we always perform this preprocessing step prior to training as a best practice.
 
 ## Usage
-
-### Training Instructions
-
-We provide dedicated training scripts for both 256×256 and 512×512 resolutions:
-
 **Supported Model Sizes**:
 - **256×256 Resolution**: Five model variants available  
   `eMIGM-MS`, `eMIGM-S`, `eMIGM-B`, `eMIGM-L`, `eMIGM-H`
 - **512×512 Resolution**: Four model variants available  
   `eMIGM-MS`, `eMIGM-S`, `eMIGM-B`, `eMIGM-L`
+
+### Training Instructions
+
+We provide dedicated training scripts for both 256×256 and 512×512 resolutions:
 
 **Configuration and Execution**:
 
@@ -96,6 +95,34 @@ We provide dedicated training scripts for both 256×256 and 512×512 resolutions
     *   `vae_path`:     The path to the pretrained VAE or DC-AE model.
 
 > **Note**: The `cached_path` should match the output directory specified in your `extract_imagenet_256.sh` or `extract_imagenet_512.sh` execution. The `vae_path` should be the path to the pretrained VAE or DC-AE model, for 256x256 resolution, you can use the pretrained VAE model, and for 512x512 resolution, you can use the pretrained DC-AE model.
+
+### Evaluation Instructions
+
+Pre-trained models are available for download at: [https://huggingface.co/GSAI-ML/eMIGM](https://huggingface.co/GSAI-ML/eMIGM)
+
+We provide dedicated evaluation scripts for both 256×256 and 512×512 resolutions:
+
+**Configuration and Execution**:
+
+1.  **Script Locations**:
+    *   Evaluation scripts for 256x256 models: `bash/evaluate/evaluate_256.sh`
+    *   Evaluation scripts for 512x512 models: `bash/evaluate/evaluate_512.sh`
+
+2.  **Example Command**:
+    ```bash
+    # Evaluate a model at 256x256 resolution
+    bash bash/evaluate/evaluate_256.sh
+    ```
+
+3.  **Parameter Configuration**: Before running the evaluation scripts, you **must** modify the following parameters:
+    *   `ckpt_path`:    The path to the downloaded pre-trained model checkpoint.
+    *   `output_dir`:   The directory where evaluation outputs and logs will be saved.
+    *   `nnodes`:       The number of distributed evaluation nodes.
+    *   `nproc_per_node`: The number of processes per node (typically the number of GPUs per node).
+    *   `data_path`:    The path to your ImageNet dataset.
+    *   `vae_path`:     The path to the pretrained VAE (for 256x256) or DC-AE model (for 512x512).
+
+> **Note**: For 256x256 resolution evaluations, use the pretrained VAE model. For 512x512 resolution evaluations, use the pretrained DC-AE model.
 
 ## Acknowledgements
 > A large portion of codes in this repo is based on [MAR](https://github.com/LTH14/mar) and [DPM-Solver](https://github.com/LuChengTHU/dpm-solver).

@@ -27,7 +27,7 @@ echo "master_port ${MASTER_PORT}"
 echo "node_rank ${RANK}"
 
 torchrun --nnodes $nnodes --nproc_per_node $nproc_per_node --master_addr $MASTER_ADDR --master_port $MASTER_PORT --node_rank $RANK main_emigm.py \
---img_size 512 --vae_path $vae_path --vae_embed_dim 32 --vae_stride 32 --patch_size 1 \
+--img_size 512 --vae_path $vae_path --vae_embed_dim 32 --vae_stride 32 --patch_size 1 --use_dc_ae \
 --epochs 800 --warmup_epochs 100 --blr 1e-4 --diffusion_batch_mul 4 \
 --online_eval \
 --output_dir "$output"/"$exp_name" --resume "$output"/"$exp_name" \
